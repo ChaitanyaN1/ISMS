@@ -6,6 +6,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+pip install isms_tracker
+
 from isms_tracker.db import read_table
 from isms_tracker.ui import PALETTE, TEAL, page_heading, plot_style, setup, metric_card
 
