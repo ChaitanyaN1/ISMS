@@ -129,7 +129,7 @@ cd ISMS
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-streamlit.txt
 ```
 
 **Linux / macOS:**
@@ -137,7 +137,7 @@ python -m pip install -r requirements.txt
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements-streamlit.txt
 ```
 
 #### 3. Install Frontend dependencies

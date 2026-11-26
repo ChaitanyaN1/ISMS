@@ -12,8 +12,6 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
-
 from isms_tracker.catalogue import ANNEX_A_CONTROLS_CATALOGUE, REGULATORY_FRAMEWORKS
 from isms_tracker.security import (
     MAX_FAILED_ATTEMPTS,
@@ -28,11 +26,12 @@ from isms_tracker.security import (
     utc_now_iso,
     validate_evidence_upload,
     verify_password,
+    verify_signed_session_token,
 )
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"
-UPLOADS_DIR = DATA_DIR / "uploads"
+UPLOADS_DIR = Path(os.environ.get("ISMS_UPLOADS_DIR", str(DATA_DIR / "uploads")))
 DEMO_DATA_PATH = DATA_DIR / "demo_data.json"
 DB_PATH = Path(os.environ.get("ISMS_DB_PATH", str(DATA_DIR / "isms_tracker.db")))
 
@@ -242,14 +241,26 @@ DEMO_ACCOUNTS = [
 
 
 def _resolve_db_path() -> Path:
-    return Path(os.environ.get("ISMS_DB_PATH", str(DB_PATH)))
+    if os.environ.get("ISMS_DB_PATH"):
+        return Path(os.environ["ISMS_DB_PATH"])
+    if os.environ.get("VERCEL") or not os.access(DATA_DIR, os.W_OK):
+        return Path("/tmp/isms_vercel/isms_tracker.db")
+    return DB_PATH
+
+
+def _resolve_uploads_dir() -> Path:
+    if os.environ.get("ISMS_UPLOADS_DIR"):
+        return Path(os.environ["ISMS_UPLOADS_DIR"])
+    if os.environ.get("VERCEL") or not os.access(DATA_DIR, os.W_OK):
+        return Path("/tmp/isms_vercel/uploads")
+    return UPLOADS_DIR
 
 
 def get_connection() -> sqlite3.Connection:
     """Open SQLite connection with row dictionary access."""
     path = _resolve_db_path()
     path.parent.mkdir(parents=True, exist_ok=True)
-    UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    _resolve_uploads_dir().mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path), check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
@@ -385,7 +396,8 @@ def _seed_demo_evidence_files(conn: sqlite3.Connection) -> None:
             "Authenticated vulnerability scan extract for Linux hosts.",
         ),
     ]
-    UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    uploads_root = _resolve_uploads_dir()
+    uploads_root.mkdir(parents=True, exist_ok=True)
     for (
         evd_id,
         title,
@@ -402,12 +414,16 @@ def _seed_demo_evidence_files(conn: sqlite3.Connection) -> None:
         existing = conn.execute(
             "SELECT 1 FROM evidence WHERE evidence_id = ?", (evd_id,)
         ).fetchone()
-        disk_path = UPLOADS_DIR / f"{evd_id}_{fname}"
+        disk_path = uploads_root / f"{evd_id}_{fname}"
         if not disk_path.exists():
             disk_path.write_bytes(raw_bytes)
         if existing:
             continue
         digest = compute_sha256_bytes(raw_bytes)
+        try:
+            stored_ref = str(disk_path.relative_to(ROOT_DIR))
+        except ValueError:
+            stored_ref = str(disk_path)
         conn.execute(
             """
             INSERT OR IGNORE INTO evidence (
@@ -424,7 +440,7 @@ def _seed_demo_evidence_files(conn: sqlite3.Connection) -> None:
                 aud_id,
                 ctrl_id,
                 fname,
-                str(disk_path.relative_to(ROOT_DIR)),
+                stored_ref,
                 mime,
                 len(raw_bytes),
                 digest,
@@ -714,8 +730,10 @@ def ensure_initialized() -> None:
         seed_demo_records(conn, force_restore=False)
 
 
-def read_table(table_name: str) -> pd.DataFrame:
-    """Read an allowed SQLite table into a pandas DataFrame."""
+def read_table(table_name: str):
+    """Read an allowed SQLite table into a pandas DataFrame (lazy-loads pandas for Streamlit)."""
+    import pandas as pd
+
     if table_name not in ALLOWED_TABLES:
         raise ValueError(f"Unsupported table: {table_name}")
     ensure_initialized()
@@ -801,10 +819,20 @@ def authenticate_user(username_or_email: str, password: str) -> dict[str, Any]:
                 "error": f"Unrecognized username or password. {remaining_tries} attempt(s) remaining before lockout.",
             }
 
-        # Successful login: reset failed_attempts & issue session token
+        # Successful login: reset failed_attempts & issue signed session token
         now = utc_now_iso()
-        token = generate_session_token()
         expires = compute_lockout_timestamp(minutes=720)
+        token = generate_session_token(
+            {
+                "user_id": user["user_id"],
+                "username": user["username"],
+                "full_name": user["full_name"],
+                "email": user["email"],
+                "role": user["role"],
+                "created_at": now,
+                "expires_at": expires,
+            }
+        )
         conn.execute(
             "UPDATE users SET failed_attempts = 0, locked_until = '', last_login = ? WHERE user_id = ?",
             (now, user["user_id"]),
@@ -850,7 +878,7 @@ def authenticate_user(username_or_email: str, password: str) -> dict[str, Any]:
 
 
 def get_session_user(token: str | None) -> dict[str, Any] | None:
-    """Resolve bearer token to an active session user."""
+    """Resolve bearer token to an active session user (DB or stateless HMAC signature)."""
     if not token:
         return None
     ensure_initialized()
@@ -858,9 +886,12 @@ def get_session_user(token: str | None) -> dict[str, Any] | None:
         row = conn.execute(
             "SELECT * FROM sessions WHERE token = ?", (token,)
         ).fetchone()
-        if not row:
-            return None
-        return dict(row)
+        if row:
+            return dict(row)
+    signed = verify_signed_session_token(token)
+    if signed:
+        return signed
+    return None
 
 
 def save_evidence_file(
@@ -892,10 +923,14 @@ def save_evidence_file(
             count += 1
             evd_id = f"EVD-2026-{count + 101:03d}"
 
-        UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
-        disk_path = UPLOADS_DIR / f"{evd_id}_{safe_name}"
+        uploads_root = _resolve_uploads_dir()
+        uploads_root.mkdir(parents=True, exist_ok=True)
+        disk_path = uploads_root / f"{evd_id}_{safe_name}"
         disk_path.write_bytes(data)
-        rel_path = str(disk_path.relative_to(ROOT_DIR))
+        try:
+            rel_path = str(disk_path.relative_to(ROOT_DIR))
+        except ValueError:
+            rel_path = str(disk_path)
         now = utc_now_iso()
 
         conn.execute(
@@ -948,7 +983,8 @@ def verify_evidence_integrity(evidence_id: str, actor: str = "system", role: str
         ).fetchone()
         if not row:
             raise KeyError(f"Evidence {evidence_id} not found.")
-        disk_path = ROOT_DIR / row["stored_path"]
+        stored_p = Path(row["stored_path"])
+        disk_path = stored_p if stored_p.is_absolute() else (ROOT_DIR / stored_p)
         if not disk_path.exists():
             status = "Missing File"
             actual_hash = ""

@@ -11,7 +11,7 @@ if not exist ".venv" (
 
 echo [2/4] Installing Python dependencies...
 .\.venv\Scripts\python.exe -m pip install --upgrade pip -q
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt -q
+.\.venv\Scripts\python.exe -m pip install -r requirements-streamlit.txt -q
 
 if not exist "node_modules" (
     echo [3/4] Installing Node.js frontend dependencies...

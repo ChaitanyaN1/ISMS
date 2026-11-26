@@ -12,6 +12,7 @@ Chapter 7 of the Minor Project Report:
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 import json
@@ -20,6 +21,11 @@ import re
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Any
+
+SESSION_SIGNING_KEY = os.environ.get(
+    "ISMS_SESSION_SECRET",
+    "secureaudit-isms-hmac-sha256-session-key-v2-27001",
+).encode("utf-8")
 
 # Lockout policy constants
 MAX_FAILED_ATTEMPTS = 5
@@ -242,9 +248,41 @@ def compute_log_entry_hash(
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def generate_session_token() -> str:
-    """Generate a 256-bit cryptographically random bearer session token."""
-    return secrets.token_urlsafe(32)
+def generate_session_token(user_payload: dict[str, str] | None = None) -> str:
+    """Generate a stateless HMAC-SHA256 signed bearer token (works across serverless instances)."""
+    if not user_payload:
+        return secrets.token_urlsafe(32)
+    body = dict(user_payload)
+    body["nonce"] = secrets.token_hex(8)
+    raw = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    b64 = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+    sig = hmac.new(SESSION_SIGNING_KEY, b64.encode("ascii"), hashlib.sha256).hexdigest()
+    return f"{b64}.{sig}"
+
+
+def verify_signed_session_token(token: str) -> dict[str, Any] | None:
+    """Verify an HMAC-SHA256 signed bearer token and return its user payload."""
+    if not token or "." not in token:
+        return None
+    try:
+        b64, sig = token.rsplit(".", 1)
+        expected_sig = hmac.new(
+            SESSION_SIGNING_KEY, b64.encode("ascii"), hashlib.sha256
+        ).hexdigest()
+        if not hmac.compare_digest(sig, expected_sig):
+            return None
+        pad = "=" * (-len(b64) % 4)
+        decoded = json.loads(base64.urlsafe_b64decode(b64 + pad).decode("utf-8"))
+        exp = decoded.get("expires_at")
+        if exp:
+            exp_dt = datetime.fromisoformat(exp)
+            if exp_dt.tzinfo is None:
+                exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+            if exp_dt < datetime.now(timezone.utc):
+                return None
+        return decoded
+    except Exception:
+        return None
 
 
 def has_permission(role: str, permission: str) -> bool:
