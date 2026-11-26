@@ -56,6 +56,11 @@ app = FastAPI(
     version="2.0.0",
     description="REST API for SecureAudit Web Tracker & ISMS ISO/IEC 27001:2022 Audit Platform",
     lifespan=lifespan,
+    # Docs live under /api/* so they remain reachable on Vercel, where all
+    # non-/api/ paths are rewritten to the React SPA (index.html).
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
 )
 
 app.add_middleware(
