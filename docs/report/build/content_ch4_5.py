@@ -2,7 +2,7 @@
 from docx_base import Report
 
 def ch4(r: Report):
-    r.chapter(4, "System Analysis And Implementation")
+    r.chapter(4, "System Analysis and Implementation")
 
     r.section("4.1", "System Overview", first=True)
     r.body("SecureAudit is organised as a three-tier system in which a single domain core serves two "
@@ -309,7 +309,7 @@ def ch4(r: Report):
 
 
 def ch5(r: Report):
-    r.chapter(5, "Results And Analysis")
+    r.chapter(5, "Results and Analysis")
 
     r.section("5.1", "Verification Results", first=True)
     r.body("Results are presented from three independent sources in the order in which they were "

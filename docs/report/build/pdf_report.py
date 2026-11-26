@@ -176,6 +176,7 @@ class PDFReport(FPDF):
         self.figmap = {}
         self.fignums = {}
         self.pagemap = {}          # key -> printed page label, filled during the build
+        self.outline = []          # (kind, number, title) in document order
         self.chapter_no = 0
         self.tab_in_ch = 0
         self._first_section = True
@@ -330,6 +331,7 @@ class PDFReport(FPDF):
         self.chapter_no = int(number) if str(number).isdigit() else self.chapter_no + 1
         self.tab_in_ch = 0
         self._record(f"ch{number}")
+        self.outline.append(("chapter", str(number), title))
         self._drain()
 
     def section(self, number, title, first=False):
@@ -339,6 +341,7 @@ class PDFReport(FPDF):
         self.ln(before * PT)
         self.set_font(FAMILY, "B", 14)
         self._record(f"s{number}")
+        self.outline.append(("section", str(number), title))
         self.multi_cell(TEXT_W, 6.2, f"{number}   {title}", align=Align.L,
                         new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         self._first_section = False
@@ -346,6 +349,8 @@ class PDFReport(FPDF):
     def subsection(self, number, title):
         self._drain()
         self._need(24 * PT + 16)
+        self._record(f"s{number}")
+        self.outline.append(("subsection", str(number), title))
         self.ln(24 * PT)
         self.set_font(FAMILY, "B", 12)
         self.multi_cell(TEXT_W, 5.6, f"{number}   {title}", align=Align.L,

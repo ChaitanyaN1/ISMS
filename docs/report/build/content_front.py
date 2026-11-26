@@ -7,6 +7,7 @@ def build_front_block(r, docx=True):
 
 
 def _build_front_docx(r):
+    docx = True
     # ---------------- TITLE PAGE (no page number) ----------------
     d = r.doc
     r.suppress_footer()
@@ -133,7 +134,16 @@ def _build_front_docx(r):
     r.new_section(footer_fmt="lowerRoman", start=5)
     r.para("CONTENTS", size=16, bold=True, align="center")
     r.para("", size=8)
-    r.toc_field()
+    if docx:
+        # a printed list, so the contents are readable without updating a field
+        for kind, number, title in _toc_entries():
+            indent = {"chapter": 0, "section": 1, "subsection": 2}[kind]
+            label = f"Chapter {number}   {title}" if kind == "chapter" else f"{number}   {title}"
+            p = r.para("      " * indent + label, size=11 if kind == "chapter" else 10.5,
+                       bold=(kind == "chapter"), align="left", space_before=6 if kind == "chapter" else 1)
+        r.toc_field(empty=False)
+    else:
+        r.toc_field()
     r.para("", size=8)
     note = r.para("Note on pagination: front matter is numbered in lower-case Roman numerals and the "
                   "body restarts at 1 on the first page of Chapter 1, in accordance with the "
@@ -187,6 +197,7 @@ def _build_front_docx(r):
 
 
 def _build_front_pdf(p):
+    docx = False
     """Front matter for the PDF renderer: lowercase Roman numerals, none on the title page."""
     from fpdf.enums import XPos, YPos
     from pdf_report import TEXT_W, PAGE_H, MB
@@ -430,51 +441,85 @@ ABBREV = [
 ]
 
 
+def _toc_entries():
+    """Default outline used when the renderer has not recorded one (DOCX path)."""
+    rows = []
+    for num, title, subs in CHAPTERS:
+        rows.append(("chapter", str(num), title))
+        for sub in subs:
+            head = sub.split("  ")[0].strip()
+            label = sub[len(head):].strip()
+            rows.append(("section", head, label))
+    return rows
+
+
 def _toc_table(p):
-    """Contents, figure list and table list with the live page number of each entry."""
+    """Contents with three levels and dot leaders, using live page numbers."""
     from fpdf.enums import XPos, YPos
     from pdf_report import TEXT_W
-    lead = 3.9
-    pagemap = getattr(p, "pagemap", {})        # filled in by build_all on pass 2
+    pagemap = getattr(p, "pagemap", {})
+    # the contents page is typeset before the chapters exist, so it uses the
+    # outline recorded by the previous build pass
+    outline = (getattr(p, "toc_outline", None)
+               or getattr(p, "outline", None)
+               or _toc_entries())
+    lead = 4.15
+    PAGE_W_COL = 12.0
 
-    def entry(label, key, indent=0, bold=False, size=9.8):
-        p._need(6)
-        p.set_font(p.fam, "B" if bold else "", size)
-        page = pagemap.get(key, "")
-        p.set_x(p.l_margin + indent)
-        p.cell(TEXT_W - 14 - indent, lead, label)
-        # cell() sets y to the top of the line; step down explicitly so successive
-        # contents rows do not creep upwards
-        p.cell(14, lead, str(page), align="C")
-        p.set_xy(p.l_margin, p.get_y() + lead)
+    def entry(kind, number, title, page):
+        indent = {"chapter": 0.0, "section": 6.0, "subsection": 12.0}[kind]
+        size = {"chapter": 11.0, "section": 10.0, "subsection": 9.6}[kind]
+        if kind == "chapter":
+            labels = [f"Chapter {number}   {title}"]
+        else:
+            labels = [f"{number}   {title}"]
+        p.set_font(p.fam, "B" if kind == "chapter" else "", size)
+        avail = TEXT_W - indent - PAGE_W_COL - 2.0
+        # wrap long titles, keeping the page number on the last line
+        lines, cur = [], ""
+        for word in labels[0].split():
+            trial = (cur + " " + word).strip()
+            if p.get_string_width(trial) <= avail or not cur:
+                cur = trial
+            else:
+                lines.append(cur)
+                cur = word
+        lines.append(cur)
+
+        p._need(lead * (len(lines) + 1.2))
+        for i, line in enumerate(lines):
+            last = i == len(lines) - 1
+            p.set_x(p.l_margin + indent)
+            p.set_font(p.fam, "B" if kind == "chapter" else "", size)
+            txt_w = p.get_string_width(line)
+            p.cell(txt_w + 0.4, lead, line)
+            if last:
+                # dot leader between the text and the page number
+                dots_x = p.l_margin + indent + txt_w + 1.6
+                dots_end = p.l_margin + TEXT_W - PAGE_W_COL
+                if dots_end > dots_x:
+                    p.set_font(p.fam, "", size)
+                    n_dots = max(1, int((dots_end - dots_x) / 1.15))
+                    p.set_xy(dots_x, p.get_y())
+                    p.cell(dots_end - dots_x, lead, "." * n_dots)
+                p.set_font(p.fam, "B" if kind == "chapter" else "", size)
+                p.cell(PAGE_W_COL, lead, str(page), align="C")
+            p.set_xy(p.l_margin, p.get_y() + lead)
 
     p.set_font(p.fam, "B", 10.2)
-    p.cell(TEXT_W - 14, 5.4, "Chapter and section", border="B")
-    p.cell(14, 5.4, "Page", border="B", align="C",
+    p.cell(TEXT_W - PAGE_W_COL, 5.4, "Chapter, section and subsection", border="B")
+    p.cell(PAGE_W_COL, 5.4, "Page", border="B", align="C",
            new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    p.ln(2.2)
-    for num, title, subs in CHAPTERS:
-        entry(f"Chapter {num}   {title}", f"ch{num}", bold=True, size=10.2)
-        for sub in subs:
-            label = sub
-            key = "s" + sub.split()[0] if sub[:1].isdigit() else None
-            entry(label, key, indent=6)
-        p.ln(1.4)
+    p.ln(3.0)
 
-    p.ln(4)
-    p._need(14)
-    p.set_font(p.fam, "B", 11.5)
-    p.cell(0, 6, "LIST OF FIGURES AND TABLES", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    p.ln(2)
-    p.set_font(p.fam, "B", 10.2)
-    p.cell(0, 5.4, "Figures", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    for n, c, _src in FIGURES:
-        entry(f"Figure {n}   {c}", f"fig{n}")
-    p.ln(3)
-    p.set_font(p.fam, "B", 10.2)
-    p.cell(0, 5.4, "Tables", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-    for n, c in TABLES:
-        entry(f"Table {n}   {c}", f"tab{n}")
+    last_chapter = None
+    for kind, number, title in outline:
+        if kind == "chapter" and last_chapter is not None:
+            p.ln(2.6)
+        key = ("ch" if kind == "chapter" else "s") + number
+        entry(kind, number, title, pagemap.get(key, ""))
+        if kind == "chapter":
+            last_chapter = number
 
     # ---------------- ABBREVIATIONS (ix) ----------------
     p.new_front_page()

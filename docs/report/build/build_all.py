@@ -73,11 +73,12 @@ def build_docx(path):
     return r
 
 
-def build_pdf(path, pagemap=None):
+def build_pdf(path, prev=None):
     p = pdf_report.PDFReport()
     p.figmap = dict(FIGMAP)
     p.fignums = dict(FIGNUMS)
-    p.pagemap = dict(pagemap or {})
+    p.pagemap = dict(getattr(prev, "pagemap", {}) or {})
+    p.toc_outline = list(getattr(prev, "outline", []) or []) or None
     build_front_block(p, docx=False)
     p.start_body()                          # Chapter 1 -> Arabic page 1
     ch1(p); ch2(p); ch3(p); ch4(p); ch5(p); ch6(p); ch7(p); ch8(p); back_matter(p)
@@ -85,13 +86,13 @@ def build_pdf(path, pagemap=None):
     return p
 
 
-def make_pdf(path, passes=3):
-    pagemap, p = {}, None
+def make_pdf(path, passes=4):
+    prev, p = None, None
     for _ in range(passes):
-        p = build_pdf(path, pagemap)
-        if p.pagemap == pagemap:
+        p = build_pdf(path, prev)
+        if prev is not None and p.pagemap == prev.pagemap and p.outline == prev.outline:
             break
-        pagemap = dict(p.pagemap)
+        prev = p
     return p
 
 
