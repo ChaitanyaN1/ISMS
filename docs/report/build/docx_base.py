@@ -381,14 +381,16 @@ class Report:
         self.tables.append((tlabel, caption))
         return tlabel
 
-    def toc_field(self):
-        """Insert a real Word TOC field (updates on open / F9)."""
+    def toc_field(self, empty=True):
+        """Insert a Word TOC field covering levels 1-3 (updates on open / F9)."""
+        if not empty:
+            return
         p = self.doc.add_paragraph()
         p.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
         run = p.add_run()
         b = OxmlElement("w:fldChar"); b.set(qn("w:fldCharType"), "begin"); b.set(qn("w:dirty"), "true")
         it = OxmlElement("w:instrText"); it.set(qn("xml:space"), "preserve")
-        it.text = r'TOC \o "1-2" \h \z \u'
+        it.text = r'TOC \o "1-3" \h \z \u'
         sep = OxmlElement("w:fldChar"); sep.set(qn("w:fldCharType"), "separate")
         t = OxmlElement("w:t"); t.text = "Right-click and choose Update Field to build the table of contents."
         end = OxmlElement("w:fldChar"); end.set(qn("w:fldCharType"), "end")

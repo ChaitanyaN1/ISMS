@@ -35,6 +35,11 @@ build/
 figures/             10 generated figures referenced by the report
 ```
 
+The contents pages are generated from the renderer's own recorded outline, so all three
+levels (chapter, section, subsection) appear with dot leaders and their real page numbers.
+The PDF is built twice: pass one records the page each heading, figure and table lands on,
+pass two typesets the front matter with those numbers.
+
 `check_format.py` verifies paper size, the three margins, 1.5 spacing, the Roman/Arabic
 page-number sequences, the new page and 55 mm drop of every chapter, heading and body
 font sizes, the absence of stretched justification gaps, the Times family, and the

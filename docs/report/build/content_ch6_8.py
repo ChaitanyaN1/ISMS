@@ -142,7 +142,7 @@ def ch6(r: Report):
 
 
 def ch7(r: Report):
-    r.chapter(7, "Conclusion And Recommendations")
+    r.chapter(7, "Conclusion and Recommendations")
 
     r.section("7.1", "Conclusion", first=True)
     r.body("This project set out to determine whether a single normalised data model could carry an "
@@ -248,7 +248,7 @@ def ch7(r: Report):
 
 
 def ch8(r: Report):
-    r.chapter(8, "Limitations And Future Research")
+    r.chapter(8, "Limitations and Future Research")
 
     r.section("8.1", "Limitations", first=True)
     r.body("The following limitations apply to the study and to the claims made in this report. They are "
