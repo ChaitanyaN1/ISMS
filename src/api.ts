@@ -58,12 +58,6 @@ export const api = {
       body: JSON.stringify({ username, password }),
     }),
 
-  demoAccounts: () =>
-    apiRequest<{
-      notice: string;
-      accounts: Array<{ username: string; full_name: string; email: string; role: string; password: string }>;
-    }>('/api/auth/demo-accounts'),
-
   workspace: (includeDemo: boolean) =>
     apiRequest<WorkspaceSnapshot>(`/api/workspace?include_demo=${includeDemo ? 'true' : 'false'}`),
 

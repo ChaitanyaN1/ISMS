@@ -44,7 +44,9 @@ export const App: React.FC = () => {
   const initialSession = getSavedSession();
   const [token, setToken] = useState<string | null>(initialSession.token);
   const [user, setUser] = useState<AuthUser | null>(initialSession.user);
-  const [view, setView] = useState<AppView>('dashboard');
+  const [view, setView] = useState<AppView>(
+    initialSession.token && initialSession.user ? 'dashboard' : 'landing'
+  );
   const [previousView, setPreviousView] = useState<AppView>('landing');
   const [selectedAuditId, setSelectedAuditId] = useState<string>('AUD-2026-001');
   const [includeDemo, setIncludeDemo] = useState<boolean>(true);
@@ -68,24 +70,15 @@ export const App: React.FC = () => {
     }
   }, [includeDemo]);
 
-  // Auto-provision default Admin demo session on first visit so live preview opens ready to explore,
-  // while keeping full Sign Out, Role Switching, and Landing Page navigation one click away.
+  // Restore the workspace only for an already-authenticated session.
+  // Visitors must sign in explicitly — there is no automatic demo login.
   useEffect(() => {
-    const boot = async () => {
-      if (!token || !user) {
-        try {
-          const res = await api.login('admin', 'Admin@27001!');
-          saveSession(res.token, res.user);
-          setToken(res.token);
-          setUser(res.user);
-        } catch {
-          // If auto-login fails, user can still sign in manually
-        }
-      }
-      await loadWorkspace();
-    };
-    boot();
-  }, [loadWorkspace]);
+    if (token && user) {
+      loadWorkspace();
+    } else {
+      setLoading(false);
+    }
+  }, [loadWorkspace, token, user]);
 
   const handleLoginSuccess = (newToken: string, newUser: AuthUser) => {
     saveSession(newToken, newUser);

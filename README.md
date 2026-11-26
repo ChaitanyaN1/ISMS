@@ -80,7 +80,7 @@ ISMS/
 │   ├── App.tsx                       # Unified navigation shell & workspace state sync
 │   └── components/
 │       ├── LandingPage.tsx           # Product overview landing page with scroll word-reveal
-│       ├── LoginView.tsx             # Salted scrypt sign-in & 1-click RBAC demo role selector
+│       ├── LoginView.tsx             # Salted scrypt sign-in form (no prefilled or autofilled credentials)
 │       ├── DashboardView.tsx         # KPI cards, Recharts compliance & severity analytics
 │       ├── AuditViews.tsx            # Audit projects list, new audit wizard, checklist & sign-off
 │       ├── FindingsView.tsx          # Findings & vulnerabilities cards + CAPA remediation tracker
@@ -119,7 +119,7 @@ ISMS/
 
 ## 🔐 Demonstration Accounts (RBAC)
 
-Both the live portal (**[https://isms1.vercel.app](https://isms1.vercel.app)**) and local installations come pre-seeded with four role-based demonstration accounts (available as 1-click pills on the Sign-In page):
+Both the live portal (**[https://isms1.vercel.app](https://isms1.vercel.app)**) and local installations come pre-seeded with four role-based demonstration accounts. The sign-in form is always empty — no credentials are prefilled, autofilled, or auto-submitted, and you must sign in before the workspace loads:
 
 | Role | Username | Password | Access Scope |
 | :--- | :--- | :--- | :--- |
