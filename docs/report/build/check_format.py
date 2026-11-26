@@ -120,7 +120,7 @@ def main():
           ", ".join(sorted(fonts)))
 
     # -- captions ------------------------------------------------------------
-    figs = sum(len(re.findall(r"^Figure \d\.\d\.", p.get_text(), re.M)) for p in doc)
+    figs = sum(len(re.findall(r"^Figure \d+\.\d+\.", p.get_text(), re.M)) for p in doc)
     tabs = sum(len(re.findall(r"^Table (F|\d+)\.\d\.", p.get_text(), re.M)) for p in doc)
     check("figures and tables carry numbered captions", figs >= 10 and tabs >= 13,
           f"{figs} figures, {tabs} tables")

@@ -65,7 +65,7 @@ def ch6(r: Report):
         "presentation rather than claiming to (Figure 4.1).",
         "Deliverables derived rather than authored. PDF, Excel, JSON and CSV outputs are generated from the "
         "same records, so a report cannot silently disagree with the register it describes "
-        "(Figure 4.8).",
+        "(Figure 5.8).",
         "Structural separation of demonstration and user data. The record-type marker, filtered views, "
         "scoped purge and non-destructive restore make accidental contamination of user data unlikely, and "
         "the persistent interface banner prevents misreading (Section 4.7).",
@@ -262,9 +262,10 @@ def ch8(r: Report):
         "The automated suite was written by the same author as the implementation. It provides regression "
         "safety and demonstrates intended behaviour; it is not an independent security assessment and it "
         "does not demonstrate the absence of exploitable defects.",
-        "The interface plates are produced by a deterministic renderer reading the database, not by a "
-        "browser capture. They reproduce content and layout faithfully but do not evidence the rendering "
-        "behaviour of the React components in different browsers.",
+        "The interface captures were taken in a single headless Chromium session at one viewport size. "
+        "They evidence the rendered state of the views visited on the route exercised, not cross-browser "
+        "consistency, responsive behaviour at other viewport widths, or interaction states that the "
+        "scripted walkthrough did not reach.",
         "The demonstration dataset is fictional. No statistical inference is drawn from it and no "
         "performance claim rests on it.",
         "Feature status reflects the submitted revision and is time-bounded. A later revision will need a "

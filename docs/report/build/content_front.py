@@ -113,8 +113,8 @@ def _build_front_docx(r):
     r.para("Results are reported from three evidence sources: the automated pytest suite, which passes "
            "all five test groups; direct inspection of the live production deployment, which returns a "
            "valid audit-chain status and generates PDF and Excel deliverables on demand; and the "
-           "rendered interface plates reproduced in Chapter 4, which are generated directly from the "
-           "seeded database rather than being illustrative mock-ups. Analysis confirms that the "
+           "rendered interface captures reproduced in Chapter 5, which were taken from the running "
+           "deployment rather than being illustrative mock-ups. Analysis confirms that the "
            "traceability chain from audit to test to evidence to finding to corrective action to report "
            "is complete and machine-readable.", space_before=10)
     r.para("The report is deliberately explicit about its boundaries. No organisational field study, "
@@ -300,8 +300,8 @@ def _build_front_pdf(p):
     p.para("Results are reported from three evidence sources: the automated pytest suite, which passes all "
            "five test groups; direct inspection of the live production deployment, which returns a valid "
            "audit-chain status and generates PDF and Excel deliverables on demand; and the rendered "
-           "interface plates in Chapter 4, which are generated directly from the seeded database rather than "
-           "being illustrative mock-ups. Analysis confirms that the traceability chain from audit to test to "
+           "interface captures in Chapter 5, which were taken from the running deployment rather than being "
+           "illustrative mock-ups. Analysis confirms that the traceability chain from audit to test to "
            "evidence to finding to corrective action to report is complete and machine-readable.",
            space_before=12)
     p.para("The report is deliberately explicit about its boundaries. No organisational field study, "
@@ -374,12 +374,18 @@ FIGURES = [
     ("4.1", "SecureAudit ISMS three-tier architecture", "figure-3-1-architecture.png"),
     ("4.2", "Entity relationship model of the ISMS schema", "figure-4-2-er-model.png"),
     ("4.3", "Seven-stage audit traceability model", "figure-4-1-workflow.png"),
-    ("4.4", "Executive security dashboard", "figure-5-1-dashboard.png"),
-    ("4.5", "Audit detail and control test workpapers", "figure-5-2-audit-detail.png"),
-    ("4.6", "Findings register and CAPA remediation tracker", "figure-5-3-findings.png"),
-    ("4.7", "Annex A Statement of Applicability", "figure-5-4-soa.png"),
-    ("4.8", "SHA-256 evidence vault and audit-chain status", "figure-5-5-evidence.png"),
-    ("4.9", "Report and export centre with approval state", "figure-5-6-reports.png"),
+    ("5.1", "Public landing page and entry to the workspace", "figure-5-0-landing.png"),
+    ("5.2", "Role sign-in with the five-attempt lockout policy", "figure-5-11-login.png"),
+    ("5.3", "Executive security dashboard", "figure-5-1-dashboard.png"),
+    ("5.4", "Audit projects register", "figure-5-10-audits.png"),
+    ("5.5", "Audit detail view with control test workpapers", "figure-5-2-audit-detail.png"),
+    ("5.6", "Findings and vulnerability register", "figure-5-3-findings.png"),
+    ("5.7", "Annex A Statement of Applicability", "figure-5-4-soa.png"),
+    ("5.8", "SHA-256 evidence vault", "figure-5-5-evidence.png"),
+    ("5.9", "Hash-chained audit trail and workspace settings", "figure-5-8-audit-trail.png"),
+    ("5.10", "Executive audit report centre", "figure-5-6-reports.png"),
+    ("5.11", "Clause 6.1.2 risk register with residual scoring", "figure-5-7-risks.png"),
+    ("5.12", "User and role management", "figure-5-9-users.png"),
 ]
 
 # (number, title) -- numbered per chapter, matching the order the tables appear in
