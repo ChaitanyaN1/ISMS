@@ -527,8 +527,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="title-3 text-[#0F172A]">Interactive readiness access</span>
                 </div>
                 <p className="body-6 mt-2 text-[#475569]">
-                  Enter your institutional or work email to validate client side access and open the
-                  live audit workspace immediately, or jump straight into the demo account view.
+                  Enter your institutional or work email to validate client side access and continue
+                  to the sign-in page, where you authenticate with your provisioned ISMS account.
                 </p>
                 <form onSubmit={handleChecklistRequest} className="mt-4 flex flex-col gap-3 sm:flex-row" noValidate>
                   <label htmlFor="readiness-email" className="sr-only">
