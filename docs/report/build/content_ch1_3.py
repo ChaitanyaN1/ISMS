@@ -108,7 +108,7 @@ def ch1(r: Report):
             [["RQ1", "How can a single normalised data model represent the complete record set of an "
                      "ISO/IEC 27001 internal audit, from scope through control testing to signed report, "
                      "while preserving machine-readable traceability between records?",
-              "Entity relationship model, schema definition, API contract and rendered interface plates."],
+              "Entity relationship model, schema definition, API contract and rendered interface captures."],
              ["RQ2", "Which security and assurance controls are necessary for an audit-record system to "
                      "support evidential claims, and can a proportionate implementation of those controls "
                      "be verified automatically rather than asserted?",
@@ -400,11 +400,12 @@ def ch3(r: Report):
         "Deployment verification checklist. A defined sequence of requests against the production URL "
         "checking the health endpoint, the OpenAPI document, the workspace payload, report generation and "
         "the hash-chain status. Limitation: it demonstrates availability and correctness, not load behaviour.",
-        "Interface rendering instrument. A deterministic renderer that reads the live SQLite database and "
-        "draws the interface plates in Chapter 4 directly from the recorded values. This replaces the "
-        "screenshot approach of the earlier iteration, where displayed values could not be tied to the "
-        "database. Limitation: it reproduces layout faithfully but is not a browser capture, so it cannot "
-        "evidence rendering behaviour of the React components.",
+        "Interface capture instrument. A scripted headless-browser session signs in with an auditor "
+        "identity, traverses each domain view of the deployed build and captures the rendered screen at "
+        "device scale factor two. Because the capture is driven by the same live endpoints that serve "
+        "the application, the values in each figure are the values the running system returned. "
+        "Limitation: a capture evidences presentation and the values displayed on the visited views, "
+        "not interaction behaviour beyond the route exercised.",
     ])
     r.para("The instruments were prepared for this report and are not validated psychometric or security "
            "instruments. Where an instrument produces a binary result, such as a test passing or a digest "
@@ -430,10 +431,12 @@ def ch3(r: Report):
            "pass and fail status of each test group, and separately exercised the production deployment. "
            "Execution results were taken from the runner's own output rather than transcribed, so that the "
            "reported count reflects what the runner observed.")
-    r.para("The data stream queried the seeded SQLite database for the values used in the interface plates "
-           "and in the analysis of counts and distributions. Because the plates are rendered from those "
-           "query results, any discrepancy between the prose and the interface would be a defect in the "
-           "report rather than an artefact of screenshot drift.")
+    r.para("The visual stream captured each domain view of the running application with a scripted "
+           "headless browser, signing in through the ordinary form rather than by injecting a session, so "
+           "that the authentication path itself is exercised. The resulting figures are reproduced in "
+           "Chapter 5 unchanged apart from cropping and scaling. Because the capture reads the same "
+           "endpoints that serve the application, any discrepancy between the prose and a figure is a "
+           "defect in the report rather than an artefact of retouching.")
     r.para("No human participants were involved, no personal data was collected, and no organisational "
            "systems were accessed. The demonstration dataset contains fictional names and email addresses "
            "in the .local domain.")
@@ -460,8 +463,8 @@ def ch3(r: Report):
             [["RQ1", "Decompose the schema into entities and reference relationships; trace an audit record "
                      "from creation through testing, evidence, findings and actions to report generation; "
                      "render the interface directly from the resulting values.",
-              "Entity relationship model, workflow traceability model, feature traceability matrix and eight "
-              "interface plates."],
+              "Entity relationship model, workflow traceability model, feature traceability matrix and the "
+              "interface captures in Chapter 5."],
              ["RQ2", "Enumerate each claimed security control; locate its implementation in source; identify "
                      "the test that exercises it; record the observed result; verify the same behaviour on "
                      "the production deployment.",

@@ -39,3 +39,24 @@ figures/             10 generated figures referenced by the report
 page-number sequences, the new page and 55 mm drop of every chapter, heading and body
 font sizes, the absence of stretched justification gaps, the Times family, and the
 figure and table caption numbering. It exits non-zero if any rule fails.
+
+## Screen captures
+
+The interface figures in Section 5.1.3 are real captures of the running application,
+not illustrations. To regenerate them:
+
+```bash
+# 1. start the API and the client
+.venv/bin/python -m uvicorn api_server:app --host 0.0.0.0 --port 8000 &
+npm run dev &                      # vite on :5173, proxies /api to :8000
+
+# 2. drive a headless browser through every view
+node docs/report/build/capture_screens.js        # landing, sign-in, nine domain views
+node docs/report/build/capture_screens_extra.js  # audit detail, checklist, log, users
+
+# 3. crop, scale and copy the results into figures/
+```
+
+The capture scripts expect Puppeteer with a Chromium binary, and they sign in through
+the ordinary form with the seeded `admin` identity rather than injecting a session, so
+the authentication path itself is exercised.
