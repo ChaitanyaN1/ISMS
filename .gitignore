@@ -1,7 +1,27 @@
+# Python & Virtual Environments
 .venv/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Streamlit
 .streamlit/secrets.toml
+
+# Local Runtime Databases & Uploaded Evidence
 data/isms_tracker.db
 data/isms_tracker.db-shm
 data/isms_tracker.db-wal
+data/uploads/*
+!data/uploads/.gitkeep
+
+# Node & Frontend Build
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# OS / Editor
+.DS_Store
+Thumbs.db

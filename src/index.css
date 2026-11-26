@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   COLOR SYSTEM SKILL — Brand, Neutral, Semantic & Dark Surface Tokens
+   WCAG AA (4.5:1+) & AAA (7:1+) verified foreground/background pairings
+   ========================================================================= */
+:root {
+  /* 1. Brand Tonal Scale (Blue 50–950) */
+  --brand-50: #EFF6FF;
+  --brand-100: #DBEAFE;
+  --brand-200: #BFDBFE;
+  --brand-300: #93C5FD;
+  --brand-400: #60A5FA;
+  --brand-500: #3B82F6;
+  --brand-600: #2563EB;
+  --brand-700: #1D4ED8;
+  --brand-800: #1E40AF;
+  --brand-900: #1E3A8A;
+  --brand-950: #172554;
+
+  /* 2. Neutral Tonal Scale (Slate 50–950) */
+  --neutral-50: #F8FAFC;
+  --neutral-100: #F1F5F9;
+  --neutral-200: #E2E8F0;
+  --neutral-300: #CBD5E1;
+  --neutral-400: #94A3B8;
+  --neutral-500: #64748B;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1E293B;
+  --neutral-900: #0F172A;
+  --neutral-950: #020617;
+
+  /* 3. Semantic Roles (Success, Warning, Error, Info) */
+  --success-bg: #ECFDF5;
+  --success-fg: #065F46;
+  --success-border: #A7F3D0;
+  --success-icon: #059669;
+
+  --warning-bg: #FFFBEB;
+  --warning-fg: #92400E;
+  --warning-border: #FDE68A;
+  --warning-icon: #D97706;
+
+  --error-bg: #FEF2F2;
+  --error-fg: #991B1B;
+  --error-border: #FECACA;
+  --error-icon: #DC2626;
+
+  --critical-bg: #450A0A;
+  --critical-fg: #FFFFFF;
+
+  --info-bg: #EFF6FF;
+  --info-fg: #1E40AF;
+  --info-border: #BFDBFE;
+  --info-icon: #2563EB;
+
+  /* 4. Approved Dark Surface Tokens (B4) */
+  --dark-bg-0: #000000;
+  --dark-bg-1: #181818;
+  --dark-bg-2: #1F1F1F;
+  --dark-bg-3: #272727;
+  --dark-bg-4: #313131;
+
+  /* 5. Spacing Scale (B2) */
+  --spacing-0: 0px;
+  --spacing-25: 2px;
+  --spacing-50: 4px;
+  --spacing-75: 8px;
+  --spacing-100: 12px;
+  --spacing-200: 16px;
+  --spacing-300: 24px;
+  --spacing-400: 32px;
+  --spacing-500: 40px;
+  --spacing-600: 48px;
+  --spacing-700: 64px;
+  --spacing-800: 80px;
+  --spacing-900: 96px;
+
+  /* 6. Motion Base Curve (B7) */
+  --ease-weighted: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  font-family: 'Manrope', sans-serif;
+  scroll-behavior: smooth;
+}
+
+code, pre, .font-mono {
+  font-family: 'Geist Mono', monospace;
+}
+
+/* =========================================================================
+   B1. NAMED TEXT STYLES (Exact Tailwind Scale & Weights, Zero Italics)
+   ========================================================================= */
+.heading-1 { font-size: 3.75rem; line-height: 1; font-weight: 600; text-wrap: balance; }
+.heading-2 { font-size: 3rem; line-height: 1; font-weight: 600; text-wrap: balance; }
+.heading-3 { font-size: 2.25rem; line-height: 2.5rem; font-weight: 600; text-wrap: balance; }
+.heading-4 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 600; text-wrap: balance; }
+.heading-5 { font-size: 1.5rem; line-height: 2rem; font-weight: 600; text-wrap: balance; }
+.heading-6 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 600; text-wrap: balance; }
+
+.title-1 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
+.title-2 { font-size: 1.125rem; line-height: 1.75rem; font-weight: 500; }
+.title-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+.title-4 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+.title-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
+
+.body-1 { font-size: 1rem; line-height: 1.5rem; font-weight: 600; text-wrap: pretty; }
+.body-2 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; text-wrap: pretty; }
+.body-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 400; text-wrap: pretty; }
+.body-4 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; text-wrap: pretty; }
+.body-5 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; text-wrap: pretty; }
+.body-6 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 400; text-wrap: pretty; }
+
+.button-lg { font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; }
+.button-md { font-size: 1rem; line-height: 1.5rem; font-weight: 600; }
+.button-sm { font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; }
+.button-xsm { font-size: 0.75rem; line-height: 1rem; font-weight: 600; }
+
+.caption-1 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+.caption-2 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 400; }
+.caption-3 { font-size: 0.75rem; line-height: 1rem; font-weight: 600; }
+.caption-4 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
+.caption-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 400; }
+
+/* Responsive Heading 1 & 2 on mobile (390px safe) */
+@media (max-width: 640px) {
+  .heading-1 { font-size: 2.25rem; line-height: 2.5rem; }
+  .heading-2 { font-size: 1.875rem; line-height: 2.25rem; }
+  .heading-3 { font-size: 1.5rem; line-height: 2rem; }
+}
+
+/* B5. Hero Text Gradient (Only place gradient is permitted — never on backgrounds) */
+.hero-heading-light {
+  background-image: linear-gradient(90deg, #000000 0%, #666666 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-heading-dark {
+  background-image: linear-gradient(90deg, #FFFFFF 0%, #9B9B9B 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* B2 & B9. Main Button Token & Interactive States */
+.btn-main {
+  padding: 8px 12px;
+  transition: transform 300ms var(--ease-weighted), opacity 300ms var(--ease-weighted), background-color 300ms var(--ease-weighted);
+}
+.btn-main:active {
+  transform: scale(0.98);
+}
+.btn-main:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
+}
+
+/* B7. Scroll Reveal Animation */
+.reveal-section {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 700ms var(--ease-weighted), transform 700ms var(--ease-weighted);
+}
+.reveal-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* B11. Tagline Word-by-Word Reveal */
+.tagline-word {
+  opacity: 0.28;
+  transition: opacity 500ms var(--ease-weighted), color 500ms var(--ease-weighted);
+}
+.tagline-word.is-active {
+  opacity: 1;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal-section {
+    transform: none;
+    transition: opacity 300ms var(--ease-weighted);
+  }
+  .tagline-word {
+    opacity: 1 !important;
+    transition: none !important;
+  }
+  .btn-main {
+    transition: none;
+  }
+}
