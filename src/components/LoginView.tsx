@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ShieldCheck, LockKey, ArrowLeft, WarningCircle, CheckCircle } from '@phosphor-icons/react';
+import React, { useState } from 'react';
+import { ShieldCheck, LockKey, ArrowLeft, WarningCircle } from '@phosphor-icons/react';
 import { api } from '../api';
 import type { AuthUser } from '../types';
 
@@ -9,20 +9,10 @@ interface LoginViewProps {
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onBackToLanding }) => {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('Admin@27001!');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [demoAccounts, setDemoAccounts] = useState<
-    Array<{ username: string; full_name: string; email: string; role: string; password: string }>
-  >([]);
-
-  useEffect(() => {
-    api
-      .demoAccounts()
-      .then((res) => setDemoAccounts(res.accounts || []))
-      .catch(() => {});
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,11 +74,17 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onBackToLanding
               </label>
               <input
                 id="login-username"
+                name="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="Enter your username"
                 required
-                className="body-5 mt-1.5 w-full rounded-lg border border-[#313131] bg-[#181818] px-3 py-2 text-white"
+                className="body-5 mt-1.5 w-full rounded-lg border border-[#313131] bg-[#181818] px-3 py-2 text-white placeholder:text-[#64748B]"
               />
             </div>
 
@@ -98,11 +94,14 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onBackToLanding
               </label>
               <input
                 id="login-password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                placeholder="Enter your password"
                 required
-                className="body-5 mt-1.5 w-full rounded-lg border border-[#313131] bg-[#181818] px-3 py-2 text-white"
+                className="body-5 mt-1.5 w-full rounded-lg border border-[#313131] bg-[#181818] px-3 py-2 text-white placeholder:text-[#64748B]"
               />
             </div>
 
@@ -116,36 +115,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onBackToLanding
             </button>
           </form>
 
-          {demoAccounts.length > 0 && (
-            <div className="mt-8 border-t border-[#313131] pt-6">
-              <p className="caption-3 uppercase tracking-wider text-[#94A3B8]">
-                Local role demonstration accounts (click to autofill)
-              </p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {demoAccounts.map((acc) => (
-                  <button
-                    key={acc.username}
-                    type="button"
-                    onClick={() => {
-                      setUsername(acc.username);
-                      setPassword(acc.password);
-                      setErrorMsg(null);
-                    }}
-                    className="flex flex-col rounded-lg border border-[#313131] bg-[#272727] p-2.5 text-left hover:border-[#60A5FA]"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="caption-3 text-white">{acc.role}</span>
-                      <CheckCircle size={14} className="text-[#60A5FA]" />
-                    </div>
-                    <span className="caption-4 mt-1 font-mono text-[#94A3B8]">{acc.username}</span>
-                  </button>
-                ))}
-              </div>
-              <p className="caption-5 mt-3 text-[#64748B]">
-                Demo credentials are strictly for local prototype evaluation and must never be used with sensitive organizational records.
-              </p>
-            </div>
-          )}
+          <p className="caption-5 mt-6 border-t border-[#313131] pt-6 text-[#64748B]">
+            Accounts are provisioned by an administrator. Contact your ISMS lead if you need access
+            or have forgotten your password.
+          </p>
         </div>
       </div>
     </div>

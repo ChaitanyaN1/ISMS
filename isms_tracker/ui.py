@@ -7,7 +7,7 @@ from typing import Any
 
 import streamlit as st
 
-from isms_tracker.db import DEMO_ACCOUNTS, authenticate_user, ensure_initialized
+from isms_tracker.db import authenticate_user, ensure_initialized
 from isms_tracker.security import has_permission
 
 TEAL = "#0F766E"
@@ -116,14 +116,9 @@ def setup(page_title: str) -> None:
         unsafe_allow_html=True,
     )
 
+    # Start every session unauthenticated: no pre-provisioned or prefilled credentials.
     if "auth_user" not in st.session_state:
-        st.session_state.auth_user = {
-            "user_id": "USR-001",
-            "username": "admin",
-            "full_name": "Alex Johnson",
-            "email": "alex.johnson@secureaudit.local",
-            "role": "Admin",
-        }
+        st.session_state.auth_user = None
 
     with st.sidebar:
         st.markdown("### 🛡️ ISMS Governance")
@@ -138,8 +133,8 @@ def setup(page_title: str) -> None:
         else:
             st.warning("Sign in required for editing actions.")
             with st.form("sidebar_login_form"):
-                uname = st.text_input("Username", placeholder="admin")
-                pwd = st.text_input("Password", type="password", placeholder="Admin@27001!")
+                uname = st.text_input("Username", placeholder="Enter your username")
+                pwd = st.text_input("Password", type="password", placeholder="Enter your password")
                 submitted = st.form_submit_button("Sign in", use_container_width=True)
                 if submitted:
                     res = authenticate_user(uname, pwd)
@@ -149,9 +144,6 @@ def setup(page_title: str) -> None:
                         st.rerun()
                     else:
                         st.error(res.get("error", "Sign-in failed."))
-            with st.expander("Demo accounts (local testing)"):
-                for _, u, _, _, role, pw in DEMO_ACCOUNTS:
-                    st.caption(f"**{role}**: `{u}` / `{pw}`")
         st.divider()
 
 
