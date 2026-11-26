@@ -1,0 +1,3 @@
+audit_id,title,department,status,audit_date,compliance,audit_type,lead_auditor,scope,objectives
+AUD-2026-101,Endpoint Encryption Verification Q4,Corporate IT,Planned,2026-12-05,88,ISO 27001,Sarah Chen,"Corporate macOS and Windows laptops across engineering and finance","Verify BitLocker and FileVault key escrow coverage under Annex A.8.1 and A.8.24"
+AUD-2026-102,Access Termination & Offboarding Audit,People Operations,In Progress,2026-11-28,74,Internal Audit,Marcus Williams,"Q3 employee and contractor offboarding tickets","Confirm account revocation within 4 hours of termination under Annex A.6.5"
