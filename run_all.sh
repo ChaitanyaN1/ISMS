@@ -12,7 +12,7 @@ fi
 
 echo "[2/4] Installing Python packages..."
 ./.venv/bin/pip install -q --upgrade pip
-./.venv/bin/pip install -q -r requirements.txt
+./.venv/bin/pip install -q -r requirements-streamlit.txt
 
 if [ ! -d "node_modules" ]; then
   echo "[3/4] Installing Node.js frontend packages..."

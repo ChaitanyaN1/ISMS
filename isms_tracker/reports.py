@@ -16,8 +16,9 @@ from __future__ import annotations
 import io
 from typing import Any
 
-import pandas as pd
 from fpdf import FPDF
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
 
 from isms_tracker.db import get_connection, ensure_initialized
 
@@ -348,9 +349,25 @@ def generate_executive_workbook() -> bytes:
         ("Evidence_Hashes", "evidence"),
         ("Audit_Trail", "audit_logs"),
     ]
-    buf = io.BytesIO()
-    with get_connection() as conn, pd.ExcelWriter(buf, engine="openpyxl") as writer:
+    wb = Workbook()
+    default_sheet = wb.active
+    wb.remove(default_sheet)
+
+    header_fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
+    header_font = Font(color="FFFFFF", bold=True)
+
+    with get_connection() as conn:
         for sheet_title, table_name in sheets:
-            df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
-            df.to_excel(writer, sheet_name=sheet_title, index=False)
+            ws = wb.create_sheet(title=sheet_title)
+            cur = conn.execute(f"SELECT * FROM {table_name}")
+            cols = [desc[0] for desc in (cur.description or [])]
+            ws.append(cols)
+            for cell in ws[1]:
+                cell.fill = header_fill
+                cell.font = header_font
+            for row in cur.fetchall():
+                ws.append([row[c] for c in cols])
+
+    buf = io.BytesIO()
+    wb.save(buf)
     return buf.getvalue()
